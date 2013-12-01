@@ -33,34 +33,68 @@
  * #L%
  */
 
-package imagej.legacy.patches;
+package imagej.legacy;
 
-import ij.ImageJ;
-import imagej.legacy.ImageJ2Bridge;
-
-import java.awt.Point;
+import ij.ImagePlus;
 
 /**
- * Overrides {@link ImageJ} methods.
+ * The {@link ImageJ2Bridge} encapsulating an active {@link LegacyService} for use within the patched ImageJ 1.x.
  * 
- * @author Curtis Rueden
+ * @author Johannes Schindelin
  */
-public class ImageJMethods {
+public class LegacyImageJ2Bridge implements ImageJ2Bridge {
 
-	/** Replaces {@link ImageJ#getLocationOnScreen()}. */
-	public static Point getLocationOnScreen(
-		final ImageJ2Bridge bridge,
-		@SuppressWarnings("unused") final ImageJ obj)
-	{
-		bridge.debug("getLocationOnScreen");
-		// TODO: Return coordinates of modern ImageJ window.
-		return new Point(0, 0);
+	private LegacyService legacyService;
+
+	public LegacyImageJ2Bridge(LegacyService legacyService) {
+		this.legacyService = legacyService;
 	}
 
-	/* an old approach
-	public static void quit(final ImageJ2Bridge legSrv, ImageJ ij)
-	{
-		legSrv.getContext().dispose();
+	@Override
+	public boolean isLegacyMode() {
+		return legacyService.isLegacyMode();
 	}
-	*/
+
+	@Override
+	public boolean isInitialized() {
+		return legacyService.isInitialized();
+	}
+
+	@Override
+	public void dispose() {
+		legacyService.getContext().dispose();
+	}
+
+	@Override
+	public void showProgress(int currentIndex, int finalIndex) {
+		legacyService.status().showProgress(currentIndex, finalIndex);
+	}
+
+	@Override
+	public void showStatus(String s) {
+		legacyService.status().showStatus(s);
+	}
+
+	@Override
+	public void registerLegacyImage(Object image) {
+		// TODO: avoid using ImagePlus here altogether; use ImgLib2-ij's wrap() instead
+		legacyService.getImageMap().registerLegacyImage((ImagePlus)image);
+	}
+
+	@Override
+	public void unregisterLegacyImage(Object image) {
+		// TODO: avoid using ImagePlus here altogether; use ImgLib2-ij's wrap() instead
+		legacyService.getImageMap().unregisterLegacyImage((ImagePlus)image);
+	}
+
+	@Override
+	public void debug(String string) {
+		legacyService.log().debug(string);
+	}
+
+	@Override
+	public void error(Throwable t) {
+		legacyService.log().error(t);
+	}
+
 }

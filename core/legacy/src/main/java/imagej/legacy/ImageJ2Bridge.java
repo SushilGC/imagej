@@ -33,34 +33,31 @@
  * #L%
  */
 
-package imagej.legacy.patches;
-
-import ij.ImageJ;
-import imagej.legacy.ImageJ2Bridge;
-
-import java.awt.Point;
+package imagej.legacy;
 
 /**
- * Overrides {@link ImageJ} methods.
+ * Encapsulates of the ImageJ2 functionality used in the patched ImageJ 1.x.
  * 
- * @author Curtis Rueden
+ * @author Johannes Schindelin
  */
-public class ImageJMethods {
+public interface ImageJ2Bridge {
 
-	/** Replaces {@link ImageJ#getLocationOnScreen()}. */
-	public static Point getLocationOnScreen(
-		final ImageJ2Bridge bridge,
-		@SuppressWarnings("unused") final ImageJ obj)
-	{
-		bridge.debug("getLocationOnScreen");
-		// TODO: Return coordinates of modern ImageJ window.
-		return new Point(0, 0);
-	}
+	boolean isLegacyMode();
 
-	/* an old approach
-	public static void quit(final ImageJ2Bridge legSrv, ImageJ ij)
-	{
-		legSrv.getContext().dispose();
-	}
-	*/
+	boolean isInitialized();
+
+	void dispose();
+
+	void showProgress(int currentIndex, int finalIndex);
+
+	void showStatus(String s);
+
+	void registerLegacyImage(Object image);
+
+	void unregisterLegacyImage(Object obj);
+
+	void debug(String string);
+
+	void error(Throwable t);
+
 }

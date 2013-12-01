@@ -33,34 +33,54 @@
  * #L%
  */
 
-package imagej.legacy.patches;
-
-import ij.ImageJ;
-import imagej.legacy.ImageJ2Bridge;
-
-import java.awt.Point;
+package imagej.legacy;
 
 /**
- * Overrides {@link ImageJ} methods.
+ * The {@link ImageJ2Bridge} to be used in the patched ImageJ 1.x as long as no legacy service is active.
  * 
- * @author Curtis Rueden
+ * @author Johannes Schindelin
  */
-public class ImageJMethods {
+public class DummyImageJ2Bridge implements ImageJ2Bridge {
 
-	/** Replaces {@link ImageJ#getLocationOnScreen()}. */
-	public static Point getLocationOnScreen(
-		final ImageJ2Bridge bridge,
-		@SuppressWarnings("unused") final ImageJ obj)
-	{
-		bridge.debug("getLocationOnScreen");
-		// TODO: Return coordinates of modern ImageJ window.
-		return new Point(0, 0);
+	@Override
+	public boolean isLegacyMode() {
+		return true;
 	}
 
-	/* an old approach
-	public static void quit(final ImageJ2Bridge legSrv, ImageJ ij)
-	{
-		legSrv.getContext().dispose();
+	@Override
+	public boolean isInitialized() {
+		return false;
 	}
-	*/
+
+	@Override
+	public void dispose() {
+		// ignore
+	}
+
+	@Override
+	public void showProgress(int currentIndex, int finalIndex) {
+	}
+
+	@Override
+	public void showStatus(String s) {
+	}
+
+	@Override
+	public void registerLegacyImage(Object image) {
+	}
+
+	@Override
+	public void unregisterLegacyImage(Object obj) {
+	}
+
+	@Override
+	public void debug(String string) {
+		System.err.println(string);
+	}
+
+	@Override
+	public void error(Throwable t) {
+		t.printStackTrace();
+	}
+
 }
